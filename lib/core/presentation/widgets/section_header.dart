@@ -24,14 +24,16 @@ class SectionHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: theme.textTheme.titleLarge),
-              if (subtitle != null) ...[
+              ...?subtitle == null
+                  ? null
+                  : [
                 const SizedBox(height: 6),
                 Text(subtitle!, style: theme.textTheme.bodyLarge),
               ],
             ],
           ),
         ),
-        if (trailing != null) trailing!,
+        ...?trailing == null ? null : [trailing!],
       ],
     );
   }

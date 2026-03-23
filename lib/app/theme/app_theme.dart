@@ -91,10 +91,10 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white.withOpacity(0.92),
+        backgroundColor: Colors.white.withValues(alpha: 0.92),
         indicatorColor: AppColors.cream,
-        labelTextStyle: MaterialStateProperty.resolveWith((states) {
-          final selected = states.contains(MaterialState.selected);
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
           return TextStyle(
             color: selected ? AppColors.charcoal : AppColors.slate,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,

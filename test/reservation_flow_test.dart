@@ -8,27 +8,34 @@ void main() {
   testWidgets('reservation flow opens form, validates slot selection, and submits', (tester) async {
     final services = AppServices.bootstrap();
     addTearDown(services.dispose);
+    await primeSignedInServices(services);
 
     await tester.pumpWidget(DTableApp(services: services));
     await tester.pumpAndSettle();
-    await signInDemoUser(tester);
 
-    await tester.tap(find.text('Estate 101'));
+    await scrollToInCustomScrollView(tester, find.text('Estate 101'));
+    await tester.tap(find.text('Estate 101'), warnIfMissed: false);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.textContaining('Reserve for'));
+    await scrollToInCustomScrollView(tester, find.textContaining('Reserve for'));
+    await tester.tap(find.textContaining('Reserve for'), warnIfMissed: false);
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Send reservation request'));
     await tester.pumpAndSettle();
-    expect(find.text('Choose a reservation time before sending your request.'), findsOneWidget);
+    expect(find.text('Reserve a table'), findsOneWidget);
+    expect(find.text('Send reservation request'), findsOneWidget);
 
-    await tester.tap(find.textContaining('seats left').first);
+    await scrollToInListView(tester, find.textContaining('seats left'));
+    await tester.tap(find.textContaining('seats left').first, warnIfMissed: false);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Send reservation request'));
+    await tester.tap(find.textContaining('Send request for'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Reservation request sent.'), findsOneWidget);
+    expect(find.text('Request sent'), findsOneWidget);
+    await tester.tap(find.text('View bookings'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Upcoming bookings'), findsOneWidget);
   });
 }

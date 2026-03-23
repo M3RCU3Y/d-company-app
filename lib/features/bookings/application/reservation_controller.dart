@@ -59,7 +59,11 @@ class ReservationController extends ChangeNotifier {
   }
 
   void incrementGuests() {
+    if (guestCount == 12) {
+      return;
+    }
     guestCount += 1;
+    errorText = null;
     notifyListeners();
   }
 
@@ -68,11 +72,27 @@ class ReservationController extends ChangeNotifier {
       return;
     }
     guestCount -= 1;
+    errorText = null;
     notifyListeners();
   }
 
   void updateNote(String value) {
     note = value;
+    errorText = null;
+  }
+
+  void applySuggestedNote(String value) {
+    if (note.contains(value)) {
+      return;
+    }
+
+    if (note.trim().isEmpty) {
+      note = value;
+    } else {
+      note = '${note.trim()} • $value';
+    }
+    errorText = null;
+    notifyListeners();
   }
 
   Future<bool> submit() async {

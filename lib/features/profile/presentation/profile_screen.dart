@@ -7,6 +7,7 @@ import '../../../core/presentation/widgets/primary_cta_button.dart';
 import '../../../core/presentation/widgets/section_header.dart';
 import '../../../features/admin/presentation/admin_mode_screen.dart';
 import '../../../features/restaurant/presentation/restaurant_mode_screen.dart';
+import '../../discover/presentation/restaurant_detail_screen.dart';
 import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -35,12 +36,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final authController = AppScope.of(context).authController;
     final profileController = AppScope.of(context).profileController;
     final favoritesController = AppScope.of(context).favoritesController;
+    final discoverController = AppScope.of(context).discoverController;
 
     return AnimatedBuilder(
-      animation: Listenable.merge([authController, profileController, favoritesController]),
+      animation: Listenable.merge([
+        authController,
+        profileController,
+        favoritesController,
+        discoverController,
+      ]),
       builder: (context, _) {
         final user = authController.currentUser;
         final profile = profileController.profile;
+        final savedRestaurants = discoverController.allRestaurants
+            .where((restaurant) => favoritesController.favoriteIds.contains(restaurant.id))
+            .toList();
         if (profile != null) {
           nameController.text = profile.name;
           phoneController.text = profile.phone;
@@ -97,6 +107,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            SectionHeader(
+              title: 'Saved spots',
+              subtitle: savedRestaurants.isEmpty
+                  ? 'Favorite restaurants from Discover and they will show up here.'
+                  : 'Jump back into your shortlist without hunting through the feed.',
+            ),
+            const SizedBox(height: 12),
+            if (savedRestaurants.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: Text(
+                  'No saved restaurants yet.',
+                  style: theme.textTheme.bodyLarge,
+                ),
+              )
+            else
+              for (final restaurant in savedRestaurants.take(3)) ...[
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  title: Text(restaurant.name),
+                  subtitle: Text(
+                    '${restaurant.location} · ${restaurant.nextSlotLabel}',
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => RestaurantDetailScreen(
+                          restaurant: restaurant,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                if (restaurant != savedRestaurants.take(3).last)
+                  const Divider(height: 1),
+              ],
             const SizedBox(height: 24),
             const SectionHeader(
               title: 'Account details',

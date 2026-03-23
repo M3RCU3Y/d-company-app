@@ -29,77 +29,182 @@ class _BookingsScreenState extends State<BookingsScreen> {
       builder: (context, _) {
         final items = selectedTab == 0 ? controller.upcoming : controller.history;
 
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-          children: [
-            Text(
-              'Bookings',
-              style: theme.textTheme.displaySmall,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Manage upcoming reservation requests and track everything that has already happened.',
-              style: theme.textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: _BookingTabButton(
-                    label: 'Upcoming',
-                    selected: selectedTab == 0,
-                    onTap: () => setState(() => selectedTab = 0),
+        return RefreshIndicator(
+          onRefresh: controller.refresh,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+            children: [
+              Text(
+                'Bookings',
+                style: theme.textTheme.displaySmall,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Manage upcoming reservation requests and track everything that has already happened.',
+                style: theme.textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 24),
+              _BookingOverviewCard(
+                upcomingCount: controller.upcoming.length,
+                historyCount: controller.history.length,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _BookingTabButton(
+                      label: 'Upcoming',
+                      selected: selectedTab == 0,
+                      onTap: () => setState(() => selectedTab = 0),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _BookingTabButton(
-                    label: 'Past',
-                    selected: selectedTab == 1,
-                    onTap: () => setState(() => selectedTab = 1),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _BookingTabButton(
+                      label: 'Past',
+                      selected: selectedTab == 1,
+                      onTap: () => setState(() => selectedTab = 1),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SectionHeader(
-              title: selectedTab == 0 ? 'Upcoming bookings' : 'Booking history',
-              subtitle: selectedTab == 0
-                  ? 'Pending and confirmed reservations still on the calendar.'
-                  : 'Completed or cancelled reservations move here.',
-            ),
-            const SizedBox(height: 18),
-            if (controller.isLoading)
-              const Padding(
-                padding: EdgeInsets.only(top: 48),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (items.isEmpty)
-              EmptyState(
-                title: selectedTab == 0
-                    ? 'No active bookings yet.'
-                    : 'No booking history yet.',
-                message: selectedTab == 0
-                    ? 'Create a reservation from Discover and it will show up here.'
-                    : 'Completed and cancelled reservations will show up once activity starts.',
-                icon: selectedTab == 0
-                    ? Icons.event_busy_rounded
-                    : Icons.history_toggle_off_rounded,
-              )
-            else
-              for (final item in items) ...[
-                _BookingCard(
-                  item: item,
-                  onCancel: item.reservation.status == ReservationStatus.pending ||
-                          item.reservation.status == ReservationStatus.confirmed
-                      ? () => controller.cancelReservation(item.reservation.id)
-                      : null,
-                ),
-                const SizedBox(height: 16),
-              ],
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              SectionHeader(
+                title: selectedTab == 0 ? 'Upcoming bookings' : 'Booking history',
+                subtitle: selectedTab == 0
+                    ? 'Pending and confirmed reservations still on the calendar.'
+                    : 'Completed or cancelled reservations move here.',
+              ),
+              const SizedBox(height: 18),
+              if (controller.isLoading)
+                const Padding(
+                  padding: EdgeInsets.only(top: 48),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (items.isEmpty)
+                EmptyState(
+                  title: selectedTab == 0
+                      ? 'No active bookings yet.'
+                      : 'No booking history yet.',
+                  message: selectedTab == 0
+                      ? 'Create a reservation from Discover and it will show up here.'
+                      : 'Completed and cancelled reservations will show up once activity starts.',
+                  icon: selectedTab == 0
+                      ? Icons.event_busy_rounded
+                      : Icons.history_toggle_off_rounded,
+                )
+              else
+                for (final item in items) ...[
+                  _BookingCard(
+                    item: item,
+                    onCancel: item.reservation.status == ReservationStatus.pending ||
+                            item.reservation.status == ReservationStatus.confirmed
+                        ? () => _confirmCancellation(context, controller, item)
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+            ],
+          ),
         );
       },
+    );
+  }
+
+  Future<void> _confirmCancellation(
+    BuildContext context,
+    BookingsController controller,
+    BookingListItem item,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel reservation?'),
+        content: Text(
+          'This will move ${item.restaurant.name} to your history and mark the reservation as cancelled.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Keep booking'),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cancel booking'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await controller.cancelReservation(item.reservation.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${item.restaurant.name} was cancelled.')),
+        );
+      }
+    }
+  }
+}
+
+class _BookingOverviewCard extends StatelessWidget {
+  const _BookingOverviewCard({
+    required this.upcomingCount,
+    required this.historyCount,
+  });
+
+  final int upcomingCount;
+  final int historyCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _BookingMetric(
+              label: 'Live bookings',
+              value: '$upcomingCount',
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _BookingMetric(
+              label: 'Past activity',
+              value: '$historyCount',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookingMetric extends StatelessWidget {
+  const _BookingMetric({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(value, style: theme.textTheme.displaySmall?.copyWith(fontSize: 28)),
+        const SizedBox(height: 6),
+        Text(label, style: theme.textTheme.bodyLarge),
+      ],
     );
   }
 }

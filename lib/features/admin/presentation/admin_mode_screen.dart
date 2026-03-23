@@ -97,7 +97,9 @@ class _AdminModeScreenState extends State<AdminModeScreen> {
                       const SizedBox(height: 8),
                       Text('Capacity: ${restaurant.seatingCapacity} seats'),
                       const SizedBox(height: 14),
-                      Row(
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
                         children: [
                           FilledButton.tonal(
                             onPressed: () async {
@@ -106,7 +108,6 @@ class _AdminModeScreenState extends State<AdminModeScreen> {
                             },
                             child: const Text('Approve'),
                           ),
-                          const SizedBox(width: 12),
                           TextButton(
                             onPressed: () async {
                               await controller.rejectRestaurant(restaurant.id);

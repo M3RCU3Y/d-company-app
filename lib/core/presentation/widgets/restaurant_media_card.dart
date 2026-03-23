@@ -43,7 +43,7 @@ class RestaurantMediaCard extends StatelessWidget {
                       child: Image.network(
                         restaurant.heroImage,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
+                        errorBuilder: (context, error, stackTrace) => Container(
                           color: AppColors.cream,
                           child: const Icon(
                             Icons.restaurant_rounded,
@@ -62,7 +62,7 @@ class RestaurantMediaCard extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.56),
+                            Colors.black.withValues(alpha: 0.56),
                           ],
                         ),
                       ),
@@ -79,10 +79,10 @@ class RestaurantMediaCard extends StatelessWidget {
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.18),
+                            color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.22),
+                              color: Colors.white.withValues(alpha: 0.22),
                             ),
                           ),
                           child: Text(
@@ -94,7 +94,7 @@ class RestaurantMediaCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        if (trailing != null) trailing!,
+                        ...?trailing == null ? null : [trailing!],
                       ],
                     ),
                   ),
@@ -123,7 +123,7 @@ class RestaurantMediaCard extends StatelessWidget {
                             Text(
                               '${restaurant.cuisine} · ${restaurant.location}',
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: AppColors.charcoal.withOpacity(0.8),
+                                color: AppColors.charcoal.withValues(alpha: 0.8),
                               ),
                             ),
                           ],

@@ -25,6 +25,7 @@ class DiscoverController extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   RestaurantFilterState get filters => _filters;
+  List<Restaurant> get allRestaurants => List<Restaurant>.unmodifiable(_restaurants);
 
   List<Restaurant> get restaurants {
     final query = _filters.query.trim().toLowerCase();

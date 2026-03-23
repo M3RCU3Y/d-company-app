@@ -8,23 +8,28 @@ void main() {
   testWidgets('bookings render seeded data and cancellation moves booking out of upcoming', (tester) async {
     final services = AppServices.bootstrap();
     addTearDown(services.dispose);
+    await primeSignedInServices(services);
 
     await tester.pumpWidget(DTableApp(services: services));
     await tester.pumpAndSettle();
-    await signInDemoUser(tester);
 
     await goToBookings(tester);
+    await scrollToInListView(tester, find.text('Maracas Tide'));
 
-    expect(find.text('Estate 101'), findsOneWidget);
+    expect(find.text('Maracas Tide'), findsOneWidget);
 
-    await tester.tap(find.text('Cancel').first);
+    await scrollToInListView(tester, find.text('Cancel'));
+    await tester.tap(find.text('Cancel').first, warnIfMissed: false);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel booking'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Estate 101'), findsNothing);
+    expect(find.text('Maracas Tide'), findsNothing);
 
+    await scrollToInListView(tester, find.text('Past'));
     await tester.tap(find.text('Past'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Estate 101'), findsOneWidget);
+    expect(find.text('Maracas Tide'), findsOneWidget);
   });
 }

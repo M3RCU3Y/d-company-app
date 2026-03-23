@@ -80,7 +80,7 @@ class DiscoverScreen extends StatelessWidget {
                               height: 180,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.08),
+                                color: Colors.white.withValues(alpha: 0.08),
                               ),
                             ),
                           ),
@@ -99,7 +99,7 @@ class DiscoverScreen extends StatelessWidget {
                                 Text(
                                   'Search by cuisine, city, or restaurant name and move from browsing to booking in one place.',
                                   style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: Colors.white.withOpacity(0.78),
+                                    color: Colors.white.withValues(alpha: 0.78),
                                   ),
                                 ),
                                 const SizedBox(height: 24),
@@ -175,7 +175,7 @@ class DiscoverScreen extends StatelessWidget {
                             favoritesController.toggleFavorite(restaurant.id);
                           },
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.18),
+                            backgroundColor: Colors.white.withValues(alpha: 0.18),
                           ),
                           icon: Icon(
                             favoritesController.isFavorite(restaurant.id)
@@ -237,7 +237,7 @@ class _HeroMetric extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
               ),
         ),
       ],
