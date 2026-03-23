@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/app_scope.dart';
+import '../../../app/domain/app_role.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/presentation/widgets/primary_cta_button.dart';
 import '../../../core/presentation/widgets/section_header.dart';
@@ -161,12 +162,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: const Text('Restaurant mode'),
               subtitle: const Text('Onboarding, hours, capacity, and reservation approvals'),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.of(context).push(
+              onTap: () async {
+                authController.setActiveRole(AppRole.restaurant);
+                await Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const RestaurantModeScreen(),
                   ),
                 );
+                authController.setActiveRole(AppRole.customer);
               },
             ),
             ListTile(
@@ -174,12 +177,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: const Text('Admin mode'),
               subtitle: const Text('Restaurant approval queue and launch oversight'),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.of(context).push(
+              onTap: () async {
+                authController.setActiveRole(AppRole.admin);
+                await Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const AdminModeScreen(),
                   ),
                 );
+                authController.setActiveRole(AppRole.customer);
               },
             ),
             const SizedBox(height: 8),

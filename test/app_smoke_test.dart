@@ -16,7 +16,7 @@ void main() {
 
     await signInDemoUser(tester);
 
-    expect(find.text('D Table'), findsOneWidget);
+    expect(find.text('Discover'), findsOneWidget);
 
     await goToBookings(tester);
     expect(find.text('Upcoming bookings'), findsOneWidget);
