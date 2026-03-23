@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'reservation.dart';
+import 'reservation_status.dart';
 
 abstract class ReservationRepository extends ChangeNotifier {
   Future<List<Reservation>> fetchReservationsForUser(String userId);

@@ -54,18 +54,19 @@ class RestaurantMediaCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.56),
-                        ],
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.56),
+                          ],
+                        ),
                       ),
                     ),
-                    child: const SizedBox.expand(),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(18),
